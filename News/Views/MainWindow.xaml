@@ -1,0 +1,172 @@
+﻿<Window x:Class="News.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:News.ViewModels"
+        xmlns:local="clr-namespace:News"
+        mc:Ignorable="d"
+        Title="Новости" Height="450" Width="800">
+    <Window.DataContext>
+        <vm:MainWindowViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <SolidColorBrush x:Key="PrimaryColor" Color="#0d6efd"/>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                Height="{TemplateBinding Height}"
+                                Width="{TemplateBinding Width}"
+                                x:Name="btn_border"
+                                CornerRadius="5">
+                            <TextBlock Text="{TemplateBinding Content}"
+                                       FontSize="{TemplateBinding FontSize}"
+                                       FontWeight="Medium"
+                                       Foreground="#fff"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation From="#0d6efd" To="#0d46ff"
+                                                            Duration="0:0:0:0.15" 
+                                                            Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                                            Storyboard.TargetName="btn_border"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation From="#0d46ff" To="#0d6efd"
+                                                            Duration="0:0:0:0.15"
+                                                            Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                                            Storyboard.TargetName="btn_border"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#0d32ff" TargetName="btn_border"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="False">
+                                <Setter Property="Background" Value="{StaticResource PrimaryColor}" TargetName="btn_border"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Height="{TemplateBinding Height}"
+                                Width="{TemplateBinding Width}"
+                                BorderBrush="#59212529"
+                                BorderThickness="1"
+                                CornerRadius="2"
+                                Padding="15,0,0,0">
+                            <Grid>
+                                <ScrollViewer Content="{TemplateBinding Text}"
+                                              x:Name="sv" PanningMode="VerticalFirst"
+                                              VerticalAlignment="Center"
+                                              VerticalScrollBarVisibility="Hidden"
+                                              HorizontalScrollBarVisibility="Hidden" 
+                                              Cursor="IBeam" ForceCursor="True"/>
+                                <TextBlock Text="{TemplateBinding Tag}" 
+                                           VerticalAlignment="Center"
+                                           Opacity="0.5">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Content, ElementName=sv}" Value="">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Margin="5">
+            <Label Content="Новости" VerticalAlignment="Center" FontSize="20"/>
+            <DockPanel HorizontalAlignment="Right">
+                <TextBox Text="{Binding KeyWord}" Width="200" 
+                         Tag="Название новости" 
+                         Margin="0,0,10,0"/>
+                <Button Command="{Binding GetNewsCommandAsync}" 
+                        FontSize="15" Width="150" Content="Поиск"/>
+            </DockPanel>
+        </DockPanel>
+
+        <Label Grid.Row="1" x:Name="loadingNews" 
+               Content="Загрузка новостей.." VerticalAlignment="Center"
+               HorizontalAlignment="Center" FontSize="20"/>
+
+        <ListBox Grid.Row="1" ItemsSource="{Binding News}"
+                 BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border CornerRadius="2" Width="400"
+                            BorderThickness="1"
+                            BorderBrush="#59212529">
+                        <Grid Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <Image Source="{Binding UrlToImage}"/>
+                            <TextBlock Grid.Row="1" Text="{Binding Title}"
+                                       FontSize="20" TextWrapping="Wrap"
+                                       TextAlignment="Center" Margin="0,10,0,0"/>
+                            <TextBlock Grid.Row="2" Text="{Binding Description}" 
+                                       TextWrapping="Wrap" TextAlignment="Left"
+                                       VerticalAlignment="Center" Padding="10"/>
+                            <DockPanel Grid.Row="3">
+                                <Label Content="{Binding PublishedAt}"/>
+                                <Label Content="{Binding Author}" Opacity="0.5"/>
+                            </DockPanel>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel HorizontalAlignment="Center"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.Style>
+                <Style TargetType="ListBox">
+                    <Setter Property="Visibility" Value="Visible"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding NewsIsLoading}" Value="True">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListBox.Style>
+        </ListBox>
+    </Grid>
+</Window>
