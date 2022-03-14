@@ -14,11 +14,12 @@ namespace News.Services
             _httpService = httpService;
         }
 
-        public async Task<BaseResponse> GetNewsAsync(string keyword)
+        public async Task<NewsResponse> GetNewsAsync(string keyword)
         {
             string url = $"https://newsapi.org/v2/everything?q={keyword}&apiKey={_apiKey}";
             byte[] buffer = await _httpService.GetAsync(url);
             string encodedJson = Encoding.UTF8.GetString(buffer);
+            
             return JsonConvert.DeserializeObject<NewsResponse>(encodedJson);
         }
 

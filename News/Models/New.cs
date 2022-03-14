@@ -19,7 +19,5 @@ namespace News.Models
         [JsonProperty("publishedAt")] public DateTime PublishedAt { get; set; }
 
         [JsonProperty("content")] public string Content { get; set; }
-
-        public Image Image { get; set; }
     }
 }

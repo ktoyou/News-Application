@@ -68,7 +68,6 @@
     </Compile>
     <Compile Include="Commands\BaseCommandAsync.cs" />
     <Compile Include="Commands\RelayCommandAsync.cs" />
-    <Compile Include="Models\BaseResponse.cs" />
     <Compile Include="Models\New.cs" />
     <Compile Include="Models\NewsResponse.cs" />
     <Compile Include="Services\HttpService.cs" />

@@ -30,6 +30,10 @@
                                        HorizontalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="btn_border" Property="Opacity"
+                                        Value="0.7"/>
+                            </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Trigger.EnterActions>
                                     <BeginStoryboard>
@@ -119,12 +123,11 @@
         </DockPanel>
 
         <Label Grid.Row="1" x:Name="loadingNews" 
-               Content="Загрузка новостей.." VerticalAlignment="Center"
+               Content="{Binding Status}" VerticalAlignment="Center"
                HorizontalAlignment="Center" FontSize="20"/>
 
         <ListBox Grid.Row="1" ItemsSource="{Binding News}"
-                 BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 >
+                 BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Border CornerRadius="2" Width="400"

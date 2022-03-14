@@ -2,7 +2,7 @@
 using News.Models;
 using News.Properties;
 using News.Services;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -11,7 +11,14 @@ namespace News.ViewModels
 {
     internal class MainWindowViewModel : BaseViewModel
     {
-        public ICommand GetNewsCommandAsync { get => new RelayCommandAsync(GetNews, ex => Error = ex.Message); }
+        public ICommand GetNewsCommandAsync 
+        { 
+            get => new RelayCommandAsync(GetNews, ex =>
+            {
+                NewsIsLoading = true;
+                Status = $"Ошибка: {ex.Message}";
+            }); 
+        }
 
         public string KeyWord
         {
@@ -23,13 +30,13 @@ namespace News.ViewModels
             }
         }
 
-        public string Error
+        public string Status
         {
-            get => _error;
+            get => _status;
             set
             {
-                _error = value;
-                OnPropertyChanged(nameof(Error));
+                _status = value;
+                OnPropertyChanged(nameof(Status));
             }
         }
 
@@ -61,16 +68,24 @@ namespace News.ViewModels
 
         private async Task GetNews()
         {
+            Status = "Загрузка новостей..";
             NewsIsLoading = true;
-            NewsResponse news = (NewsResponse)await _newsService.GetNewsAsync(KeyWord);
-            News = new List<New>(news.News);
-            NewsIsLoading = false;
+            NewsResponse news = await _newsService.GetNewsAsync(KeyWord);
+
+            switch (news.Status)
+            {
+                case "ok":
+                    News = new List<New>(news.News);
+                    NewsIsLoading = false;
+                    return;
+                case "error": throw new Exception(news.Message);
+            }
         }
 
         private readonly INewsService _newsService;
         private string _keyWord;
         private bool _newsIsLoading;
-        private string _error;
+        private string _status;
         private List<New> _news;
     }
 }
